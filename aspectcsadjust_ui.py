@@ -1,0 +1,92 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'aspectcsadjust.ui'
+#
+# Created: Sun Nov 11 09:43:34 2012
+#      by: pyside-uic 0.2.13 running on PySide 1.1.0
+#
+# WARNING! All changes made in this file will be lost!
+
+from PySide import QtCore, QtGui
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(800, 600)
+        self.centralwidget = QtGui.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.gridLayout = QtGui.QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName("gridLayout")
+        self.verticalLayout_3 = QtGui.QVBoxLayout()
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.tableView = QtGui.QTableView(self.centralwidget)
+        self.tableView.setObjectName("tableView")
+        self.verticalLayout_3.addWidget(self.tableView)
+        self.horizontalLayout_4 = QtGui.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.verticalLayout = QtGui.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout_3 = QtGui.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.editReport = QtGui.QLineEdit(self.centralwidget)
+        self.editReport.setObjectName("editReport")
+        self.horizontalLayout_3.addWidget(self.editReport)
+        self.buttonReport = QtGui.QPushButton(self.centralwidget)
+        self.buttonReport.setObjectName("buttonReport")
+        self.horizontalLayout_3.addWidget(self.buttonReport)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.editSample = QtGui.QLineEdit(self.centralwidget)
+        self.editSample.setObjectName("editSample")
+        self.horizontalLayout.addWidget(self.editSample)
+        self.buttonSample = QtGui.QPushButton(self.centralwidget)
+        self.buttonSample.setObjectName("buttonSample")
+        self.horizontalLayout.addWidget(self.buttonSample)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.horizontalLayout_2 = QtGui.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.editResult = QtGui.QLineEdit(self.centralwidget)
+        self.editResult.setObjectName("editResult")
+        self.horizontalLayout_2.addWidget(self.editResult)
+        self.buttonResult = QtGui.QPushButton(self.centralwidget)
+        self.buttonResult.setObjectName("buttonResult")
+        self.horizontalLayout_2.addWidget(self.buttonResult)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout_4.addLayout(self.verticalLayout)
+        spacerItem = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_4.addItem(spacerItem)
+        self.verticalLayout_2 = QtGui.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.lcdNumber = QtGui.QLCDNumber(self.centralwidget)
+        self.lcdNumber.setObjectName("lcdNumber")
+        self.verticalLayout_2.addWidget(self.lcdNumber)
+        self.buttonStart = QtGui.QPushButton(self.centralwidget)
+        self.buttonStart.setObjectName("buttonStart")
+        self.verticalLayout_2.addWidget(self.buttonStart)
+        self.horizontalLayout_4.addLayout(self.verticalLayout_2)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_4)
+        self.gridLayout.addLayout(self.verticalLayout_3, 0, 0, 1, 1)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 18))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtGui.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+        QtCore.QObject.connect(self.buttonReport, QtCore.SIGNAL("clicked()"), MainWindow.selectReport)
+        QtCore.QObject.connect(self.buttonSample, QtCore.SIGNAL("clicked()"), MainWindow.selectSample)
+        QtCore.QObject.connect(self.buttonResult, QtCore.SIGNAL("clicked()"), MainWindow.selectResult)
+        QtCore.QObject.connect(self.buttonStart, QtCore.SIGNAL("clicked()"), MainWindow.runcheck)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "AspectCSAdjust", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonReport.setText(QtGui.QApplication.translate("MainWindow", "Report", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonSample.setText(QtGui.QApplication.translate("MainWindow", "Campioni", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonResult.setText(QtGui.QApplication.translate("MainWindow", "Risultati", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonStart.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
+
