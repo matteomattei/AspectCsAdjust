@@ -141,7 +141,8 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		"""Overlod of the actual closeEvent method.
 		Just to make sure to close the working thread on closure."""
 		self.thread.exiting=True
-		self.waitstatus('finished')
+		if self.thread.isRunning():
+			self.waitstatus('finished')
 		event.accept()
 
 	def runcheck(self):
