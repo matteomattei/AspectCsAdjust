@@ -27,12 +27,12 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QLineEdit" name="editReport"/>
+             <widget class="QLineEdit" name="editResult"/>
             </item>
             <item>
-             <widget class="QPushButton" name="buttonReport">
+             <widget class="QPushButton" name="buttonResult">
               <property name="text">
-               <string>Report</string>
+               <string>Results</string>
               </property>
              </widget>
             </item>
@@ -55,12 +55,12 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QLineEdit" name="editResult"/>
+             <widget class="QLineEdit" name="editReport"/>
             </item>
             <item>
-             <widget class="QPushButton" name="buttonResult">
+             <widget class="QPushButton" name="buttonReport">
               <property name="text">
-               <string>Risultati</string>
+               <string>Report</string>
               </property>
              </widget>
             </item>

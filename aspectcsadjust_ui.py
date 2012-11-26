@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'aspectcsadjust.ui'
 #
-# Created: Sun Nov 11 09:43:34 2012
-#      by: pyside-uic 0.2.13 running on PySide 1.1.0
+# Created: Mon Nov 26 22:41:05 2012
+#      by: pyside-uic 0.2.13 running on PySide 1.1.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -28,12 +28,12 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.editReport = QtGui.QLineEdit(self.centralwidget)
-        self.editReport.setObjectName("editReport")
-        self.horizontalLayout_3.addWidget(self.editReport)
-        self.buttonReport = QtGui.QPushButton(self.centralwidget)
-        self.buttonReport.setObjectName("buttonReport")
-        self.horizontalLayout_3.addWidget(self.buttonReport)
+        self.editResult = QtGui.QLineEdit(self.centralwidget)
+        self.editResult.setObjectName("editResult")
+        self.horizontalLayout_3.addWidget(self.editResult)
+        self.buttonResult = QtGui.QPushButton(self.centralwidget)
+        self.buttonResult.setObjectName("buttonResult")
+        self.horizontalLayout_3.addWidget(self.buttonResult)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -46,12 +46,12 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.horizontalLayout_2 = QtGui.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
-        self.editResult = QtGui.QLineEdit(self.centralwidget)
-        self.editResult.setObjectName("editResult")
-        self.horizontalLayout_2.addWidget(self.editResult)
-        self.buttonResult = QtGui.QPushButton(self.centralwidget)
-        self.buttonResult.setObjectName("buttonResult")
-        self.horizontalLayout_2.addWidget(self.buttonResult)
+        self.editReport = QtGui.QLineEdit(self.centralwidget)
+        self.editReport.setObjectName("editReport")
+        self.horizontalLayout_2.addWidget(self.editReport)
+        self.buttonReport = QtGui.QPushButton(self.centralwidget)
+        self.buttonReport.setObjectName("buttonReport")
+        self.horizontalLayout_2.addWidget(self.buttonReport)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.horizontalLayout_4.addLayout(self.verticalLayout)
         spacerItem = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
@@ -68,7 +68,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
         self.gridLayout.addLayout(self.verticalLayout_3, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar = QtGui.QMenuBar()
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 18))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
@@ -85,8 +85,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "AspectCSAdjust", None, QtGui.QApplication.UnicodeUTF8))
-        self.buttonReport.setText(QtGui.QApplication.translate("MainWindow", "Report", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonResult.setText(QtGui.QApplication.translate("MainWindow", "Results", None, QtGui.QApplication.UnicodeUTF8))
         self.buttonSample.setText(QtGui.QApplication.translate("MainWindow", "Campioni", None, QtGui.QApplication.UnicodeUTF8))
-        self.buttonResult.setText(QtGui.QApplication.translate("MainWindow", "Risultati", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonReport.setText(QtGui.QApplication.translate("MainWindow", "Report", None, QtGui.QApplication.UnicodeUTF8))
         self.buttonStart.setText(QtGui.QApplication.translate("MainWindow", "Start", None, QtGui.QApplication.UnicodeUTF8))
 

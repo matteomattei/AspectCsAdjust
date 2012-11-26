@@ -7,8 +7,25 @@ from PySide.QtCore import *
 from aspectcsadjust_ui import *
 import sys, os, time, csv
 
-VERSION='0.1'
+VERSION='0.2'
 UPDATE_DELAY=5
+VERBOSE_DEBUG='no'
+
+DEFAULT_RESULT='C:\Result.csv'
+DEFAULT_SAMPLE='C:\Defstd.alv'
+DEFAULT_REPORT='C:\Report.csv'
+
+RES_NUM_COL=0
+RES_NAME_COL=1
+RES_LINE_COL=2
+RES_NAME2_COL=36
+RES_POS_COL=32
+RES_ABS_COL=18
+RES_DATE_COL=21
+RES_TIME_COL=22
+
+SAM_NAME_COL=0
+SAM_LINE_COL=1
 
 class MyTableModel(QAbstractTableModel): 
 	def __init__(self, data, header, parent=None, *args):
@@ -54,44 +71,77 @@ class WorkingThread(QThread):
 		self.exiting = False
 		self.sig_timer = TimerSignal()
 		self.sig_data = ParseDataSignal()
-		self.reportfile = ''
-		self.samplefile = ''
 		self.resultfile = ''
+		self.samplefile = ''
+		self.reportfile = ''
+		self.sampledata = []
 
 	def run(self):
 		"""Thread callback"""
 		self.checkfiles()
 		counter=0
 		global UPDATE_DELAY
-		self.parsereport()
+		if self.exiting==False:
+			self.parsesample()
+			self.parseresult()
+			self.processresult()
 		while self.exiting==False:
 			if counter>=UPDATE_DELAY:
 				counter=0
-				self.parsereport()
+				self.parseresult()
+				self.processresult()
 			else:
 				counter=counter+1
 			self.sig_timer.sigtimer.emit(counter)
 			time.sleep(1)
 
 	def checkfiles(self):
-		"""Check if report, sample and result files are OK."""
-		if not os.path.isfile(self.reportfile) or not os.path.isfile(self.samplefile):
+		"""Check if result, sample and report files are OK."""
+		if not os.path.isfile(self.resultfile) or not os.path.isfile(self.samplefile):
 			self.exiting=True
 		try:
-			f = open(self.resultfile,'w')
+			f = open(self.reportfile,'w')
 		except:
 			self.exiting=True
 		f.close()
 
-	def parsereport(self):
-		"""Parse report csv file"""
-		data = []
-		report = open(self.reportfile,'r')
-		reader = csv.reader(report)
-		for row in reader:
-			data.append(row)
-		report.close()
-		self.sig_data.sigdata.emit(data)
+	def parseresult(self):
+		"""Parse result csv file"""
+		# REVISE !!! FILE FORMAT IS FUNNIER THAN THIS. There are free-text lines at the beginning and the separator is ';', not ','
+		self.data = []
+		with open(self.resultfile,'r') as result:
+			reader = csv.reader(result)
+			for row in reader:
+				self.data.append(row)
+		self.sig_data.sigdata.emit(self.data)
+	
+	def processresult(self):
+		"""Generate output reports based on latest result data"""
+		self.output_data = []
+		try:
+			#output_data format: ("Numero,Nome,Elemento,Concentrazione,KAL,Diluizione,Posizione,Assorbanza,Data,Ora")
+			for row in self.data:
+				self.output_data.append([row[RES_NUM_COL],row[RES_NAME_COL],row[RES_LINE_COL].strip("1234567890 "),0,' ',row[RES_NAME2_COL],row[RES_POS_COL],row[RES_ABS_COL],row[RES_DATE_COL],row[RES_TIME_COL]])
+				for samplerow in self.sampledata:
+					#print row
+					#print samplerow
+					if row[RES_NAME_COL].strip()==samplerow[SAM_NAME_COL].strip() and row[RES_LINE_COL].strip("1234567890 ")==samplerow[SAM_LINE_COL].strip():
+						self.output_data[-1][3]=666
+		except:
+			print("Error, wrong input file format!")
+			self.exiting=True
+					
+		print("records in/out: "+str(len(self.data))+"/"+str(len(self.output_data)))
+	
+	def parsesample(self):
+		"""Parse sample csv file"""
+		self.sampledata = []
+		with open(self.samplefile,'r') as samples:
+			reader = csv.reader(samples)
+			for row in reader:
+				self.sampledata.append(row)
+		if VERBOSE_DEBUG=='yes':
+			print(self.sampledata)
 
 class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self, parent=None):
@@ -107,6 +157,13 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		self.thread.terminated.connect(self.thread_terminated)
 		self.thread.sig_timer.sigtimer.connect(self.updatetimer)
 		self.thread.sig_data.sigdata.connect(self.filltable)
+		
+		self.thread.samplefile = DEFAULT_SAMPLE
+		self.editSample.setText(DEFAULT_SAMPLE)
+ 		self.thread.reportfile = DEFAULT_REPORT
+		self.editReport.setText(DEFAULT_REPORT)
+		self.thread.resultfile = DEFAULT_RESULT
+		self.editResult.setText(DEFAULT_RESULT)
 
 	def centerwindow(self):
 		"""Function to center the mainwindow in the display screen."""
@@ -115,12 +172,12 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		self.move((screen.width() - size.width()) / 2,
 				(screen.height() - size.height()) / 2)
 
-	def selectReport(self):
-		"""Slot for select report file."""
-		archive = self.filebrowser.getOpenFileName(self,'Select Report CSV file','.','CSV file (*.csv)')
+	def selectResult(self):
+		"""Slot for select result file."""
+		archive = self.filebrowser.getOpenFileName(self,'Select Result CSV file','.','CSV file (*.csv)')
 		if archive[0] != '' and os.path.isfile(archive[0]):
-			self.thread.reportfile = archive[0]
-			self.editReport.setText(archive[0]) 
+			self.thread.resultfile = archive[0]
+			self.editResult.setText(archive[0]) 
 
 	def selectSample(self):
 		"""Slot for select sample file."""
@@ -129,13 +186,13 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 			self.thread.samplefile = archive[0]
 			self.editSample.setText(archive[0]) 
 
-	def selectResult(self):
-		"""Slot for select result file."""
-		archive = self.filebrowser.getSaveFileName(self,'Select Result CSV file','aaa.csv','CSV file (*.csv)')
+	def selectReport(self):
+		"""Slot for select report file."""
+		archive = self.filebrowser.getSaveFileName(self,'Select Report CSV file','aaa.csv','CSV file (*.csv)')
 		print(archive)
 		if archive[0] != '':
-			self.thread.resultfile = archive[0]
-			self.editResult.setText(archive[0])
+			self.thread.reportfile = archive[0]
+			self.editReport.setText(archive[0])
 
 	def closeEvent(self, event):
 		"""Overlod of the actual closeEvent method.
@@ -218,7 +275,8 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		#self.tableView.setItemDelegate( MyCellDelegate() )
 #		self.tableView.setModel(tm)
 #		self.tableView.resizeColumnsToContents()
-		print(data)
+		if VERBOSE_DEBUG=='yes':
+			print(data)
 
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
