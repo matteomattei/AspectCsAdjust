@@ -11,10 +11,12 @@ VERSION='0.2'
 UPDATE_DELAY=5
 VERBOSE_DEBUG='no'
 
+PERSIST_FILE=".persist"
 DEFAULT_RESULT='C:\Result.csv'
 DEFAULT_SAMPLE='C:\Defstd.alv'
 DEFAULT_REPORT='C:\Report.csv'
 
+RES_ROWLEN=43
 RES_NUM_COL=0
 RES_NAME_COL=1
 RES_LINE_COL=2
@@ -101,18 +103,27 @@ class WorkingThread(QThread):
 			self.exiting=True
 		try:
 			f = open(self.reportfile,'w')
+			with open(PERSIST_FILE,'w') as persist:
+				persist.write(self.samplefile+'\n')
+				persist.write(self.reportfile+'\n')
+				persist.write(self.resultfile+'\n')
 		except:
 			self.exiting=True
 		f.close()
 
 	def parseresult(self):
 		"""Parse result csv file"""
-		# REVISE !!! FILE FORMAT IS FUNNIER THAN THIS. There are free-text lines at the beginning and the separator is ';', not ','
 		self.data = []
-		with open(self.resultfile,'r') as result:
-			reader = csv.reader(result)
-			for row in reader:
-				self.data.append(row)
+		with open(self.resultfile,'rb') as result:
+			reader = csv.reader(result, delimiter=';')
+			try:
+				for row in reader:
+					# only bring in a row if it's the expected length. This will cut out freetext file headers.
+					if(len(row)==RES_ROWLEN):
+						self.data.append(row)
+			except csv.Error as e:
+ 				sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
+		
 		self.sig_data.sigdata.emit(self.data)
 	
 	def processresult(self):
@@ -127,7 +138,7 @@ class WorkingThread(QThread):
 					#print samplerow
 					if row[RES_NAME_COL].strip()==samplerow[SAM_NAME_COL].strip() and row[RES_LINE_COL].strip("1234567890 ")==samplerow[SAM_LINE_COL].strip():
 						self.output_data[-1][3]=666
-		except:
+		except Error as e:
 			print("Error, wrong input file format!")
 			self.exiting=True
 					
@@ -136,7 +147,7 @@ class WorkingThread(QThread):
 	def parsesample(self):
 		"""Parse sample csv file"""
 		self.sampledata = []
-		with open(self.samplefile,'r') as samples:
+		with open(self.samplefile,'rb') as samples:
 			reader = csv.reader(samples)
 			for row in reader:
 				self.sampledata.append(row)
@@ -157,13 +168,24 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		self.thread.terminated.connect(self.thread_terminated)
 		self.thread.sig_timer.sigtimer.connect(self.updatetimer)
 		self.thread.sig_data.sigdata.connect(self.filltable)
-		
-		self.thread.samplefile = DEFAULT_SAMPLE
-		self.editSample.setText(DEFAULT_SAMPLE)
- 		self.thread.reportfile = DEFAULT_REPORT
-		self.editReport.setText(DEFAULT_REPORT)
-		self.thread.resultfile = DEFAULT_RESULT
-		self.editResult.setText(DEFAULT_RESULT)
+	
+		try:
+			with open(PERSIST_FILE,'r') as persist:
+				print("Opened "+PERSIST_FILE)	
+				self.thread.samplefile = persist.readline()
+				self.editSample.setText(self.thread.samplefile)
+ 				self.thread.reportfile = persist.readline()
+				self.editReport.setText(self.thread.reportfile)
+				self.thread.resultfile = persist.readline()
+				self.editResult.setText(self.thread.resultfile)
+		except:
+			print("Can not read persistant config, using defaults")	
+			self.thread.samplefile = DEFAULT_SAMPLE
+			self.editSample.setText(DEFAULT_SAMPLE)
+ 			self.thread.reportfile = DEFAULT_REPORT
+			self.editReport.setText(DEFAULT_REPORT)
+			self.thread.resultfile = DEFAULT_RESULT
+			self.editResult.setText(DEFAULT_RESULT)
 
 	def centerwindow(self):
 		"""Function to center the mainwindow in the display screen."""
@@ -267,7 +289,7 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		"""Update LCD display number [5, 4, 3, 2, 1, 0]."""
 		self.lcdNumber.display(value)
 	
-	def filltable(self,data):
+	def filltable(self, data):
 		header = ['File', 'Result', 'Package', 'Board', 'Name', 'Version', 'Date', 'Signature / Range / Hash', 'Info']
 #		data = [('uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove'),('uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove')]
 #		nrows = len(data)
