@@ -9,7 +9,6 @@ import sys, os, time, csv
 
 VERSION='0.2'
 UPDATE_DELAY=5
-VERBOSE_DEBUG='no'
 
 PERSIST_FILE=".persist"
 DEFAULT_RESULT='C:\Result.csv'
@@ -123,8 +122,6 @@ class WorkingThread(QThread):
 						self.data.append(row)
 			except csv.Error as e:
  				sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
-		
-		self.sig_data.sigdata.emit(self.data)
 	
 	def processresult(self):
 		"""Generate output reports based on latest result data"""
@@ -143,6 +140,7 @@ class WorkingThread(QThread):
 			self.exiting=True
 					
 		print("records in/out: "+str(len(self.data))+"/"+str(len(self.output_data)))
+		self.sig_data.sigdata.emit(self.output_data)
 	
 	def parsesample(self):
 		"""Parse sample csv file"""
@@ -151,8 +149,6 @@ class WorkingThread(QThread):
 			reader = csv.reader(samples)
 			for row in reader:
 				self.sampledata.append(row)
-		if VERBOSE_DEBUG=='yes':
-			print(self.sampledata)
 
 class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self, parent=None):
@@ -172,11 +168,11 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		try:
 			with open(PERSIST_FILE,'r') as persist:
 				print("Opened "+PERSIST_FILE)	
-				self.thread.samplefile = persist.readline()
+				self.thread.samplefile = persist.readline().strip('\n')
 				self.editSample.setText(self.thread.samplefile)
- 				self.thread.reportfile = persist.readline()
+ 				self.thread.reportfile = persist.readline().strip('\n')
 				self.editReport.setText(self.thread.reportfile)
-				self.thread.resultfile = persist.readline()
+				self.thread.resultfile = persist.readline().strip('\n')
 				self.editResult.setText(self.thread.resultfile)
 		except:
 			print("Can not read persistant config, using defaults")	
@@ -290,15 +286,14 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		self.lcdNumber.display(value)
 	
 	def filltable(self, data):
-		header = ['File', 'Result', 'Package', 'Board', 'Name', 'Version', 'Date', 'Signature / Range / Hash', 'Info']
-#		data = [('uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove'),('uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove')]
-#		nrows = len(data)
-#		tm = MyTableModel(data, header, self)
+		header = ['No.', 'Nome', 'Elemento', 'Concentrazione', 'KAL', 'Diluizione', 'Posizione', 'Assorbanza', 'Data', 'Ora']
+		#data = [('uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove'),('uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove')]
+		nrows = len(data)
+		tm = MyTableModel(data, header, self)
 		#self.tableView.setItemDelegate( MyCellDelegate() )
-#		self.tableView.setModel(tm)
-#		self.tableView.resizeColumnsToContents()
-		if VERBOSE_DEBUG=='yes':
-			print(data)
+		self.tableView.setModel(tm)
+		self.tableView.resizeColumnsToContents()
+		#print(data)
 
 if __name__ == "__main__":
 	app = QtGui.QApplication(sys.argv)
