@@ -118,7 +118,7 @@ class WorkingThread(QThread):
 			try:
 				for row in reader:
 					# only bring in a row if it's the expected length. This will cut out freetext file headers.
-					if(len(row)==RES_ROWLEN):
+					if(len(row)==RES_ROWLEN) and row[RES_NUM_COL].strip().isdigit():
 						self.data.append(row)
 			except csv.Error as e:
  				sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
@@ -135,6 +135,7 @@ class WorkingThread(QThread):
 					#print samplerow
 					if row[RES_NAME_COL].strip()==samplerow[SAM_NAME_COL].strip() and row[RES_LINE_COL].strip("1234567890 ")==samplerow[SAM_LINE_COL].strip():
 						self.output_data[-1][3]=666
+				print self.output_data[-1][0]
 		except Error as e:
 			print("Error, wrong input file format!")
 			self.exiting=True
