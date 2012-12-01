@@ -116,7 +116,7 @@ class WorkingThread(QThread):
 	def parseresult(self):
 		"""Parse result csv file"""
 		self.data = []
-		with open(self.resultfile,'rb') as result:
+		with open(self.resultfile,'r') as result:
 			reader = csv.reader(result, delimiter=';')
 			try:
 				for row in reader:
@@ -124,7 +124,7 @@ class WorkingThread(QThread):
 					if(len(row)==RES_ROWLEN) and row[RES_NUM_COL].strip().isdigit():
 						self.data.append(row)
 			except csv.Error as e:
- 				sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
+ 				sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
 	
 	def processresult(self):
 		"""Generate output reports based on latest result data"""
@@ -149,7 +149,7 @@ class WorkingThread(QThread):
 	def parsesample(self):
 		"""Parse sample csv file"""
 		self.sampledata = []
-		with open(self.samplefile,'rb') as samples:
+		with open(self.samplefile,'r') as samples:
 			reader = csv.reader(samples)
 			for row in reader:
 				self.sampledata.append(row)
@@ -174,7 +174,7 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 				print("Opened "+PERSIST_FILE)	
 				self.thread.samplefile = persist.readline().strip('\n')
 				self.editSample.setText(self.thread.samplefile)
- 				self.thread.reportfile = persist.readline().strip('\n')
+				self.thread.reportfile = persist.readline().strip('\n')
 				self.editReport.setText(self.thread.reportfile)
 				self.thread.resultfile = persist.readline().strip('\n')
 				self.editResult.setText(self.thread.resultfile)
@@ -182,7 +182,7 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 			print("Can not read persistant config, using defaults")	
 			self.thread.samplefile = DEFAULT_SAMPLE
 			self.editSample.setText(DEFAULT_SAMPLE)
- 			self.thread.reportfile = DEFAULT_REPORT
+			self.thread.reportfile = DEFAULT_REPORT
 			self.editReport.setText(DEFAULT_REPORT)
 			self.thread.resultfile = DEFAULT_RESULT
 			self.editResult.setText(DEFAULT_RESULT)
@@ -211,7 +211,6 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 	def selectReport(self):
 		"""Slot for select report file."""
 		archive = self.filebrowser.getSaveFileName(self,'Select Report CSV file','aaa.csv','CSV file (*.csv)')
-		print(archive)
 		if archive[0] != '':
 			self.thread.reportfile = archive[0]
 			self.editReport.setText(archive[0])
