@@ -27,6 +27,9 @@ RES_TIME_COL=22
 
 SAM_NAME_COL=0
 SAM_LINE_COL=1
+SAM_CONC_COL=2
+SAM_ABS_COL=3
+SAM_NAME2_COL=4
 
 class MyTableModel(QAbstractTableModel): 
 	def __init__(self, data, header, parent=None, *args):
@@ -134,8 +137,8 @@ class WorkingThread(QThread):
 					#print row
 					#print samplerow
 					if row[RES_NAME_COL].strip()==samplerow[SAM_NAME_COL].strip() and row[RES_LINE_COL].strip("1234567890 ")==samplerow[SAM_LINE_COL].strip():
-						self.output_data[-1][3]=666
-				print self.output_data[-1][0]
+						self.output_data[-1][3]= 666#( samplerow[SAM_CONC_COL] * row[RES_ABS_COL] ) / ( samplerow[SAM_ABS_COL] ) * (row[RES_NAME2_COL] / samplerow[SAM_NAME2_COL])
+				#print self.output_data[-1][0]
 		except Error as e:
 			print("Error, wrong input file format!")
 			self.exiting=True
