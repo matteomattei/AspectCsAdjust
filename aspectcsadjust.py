@@ -130,18 +130,44 @@ class WorkingThread(QThread):
 		"""Generate output reports based on latest result data"""
 		self.output_data = []
 		try:
-			#output_data format: ("Numero,Nome,Elemento,Concentrazione,KAL,Diluizione,Posizione,Assorbanza,Data,Ora")
+			# output_data format: ("Numero,Nome,Elemento,Concentrazione,KAL,Diluizione,Posizione,Assorbanza,Data,Ora")
+			# Init the reference sample to be used. It is done outside the loop because it is global to the "parser pass", i.e. it is entirely possible
+			# that, when we parse the nth result row, we have to use the sample row from one of the previous result rows. This is due to the fact that
+			# the sample to be used in the formula is defined as "the latest sample row whose NAME and LINE matched the NAME and LINE in a result row"
+			latest_conc_match = 0
+			# ABS value from the latest result row that matched with a sample
+			latest_abs_match = 1 
+			latest_name2_match = 1
 			for row in self.data:
 				self.output_data.append([row[RES_NUM_COL],row[RES_NAME_COL],row[RES_LINE_COL].strip("1234567890 "),0,' ',row[RES_NAME2_COL],row[RES_POS_COL],row[RES_ABS_COL],row[RES_DATE_COL],row[RES_TIME_COL]])
 				for samplerow in self.sampledata:
 					#print row
 					#print samplerow
+					# Check whether we have to update the latest matching sample
 					if row[RES_NAME_COL].strip()==samplerow[SAM_NAME_COL].strip() and row[RES_LINE_COL].strip("1234567890 ")==samplerow[SAM_LINE_COL].strip():
-						self.output_data[-1][3]= 666#( samplerow[SAM_CONC_COL] * row[RES_ABS_COL] ) / ( samplerow[SAM_ABS_COL] ) * (row[RES_NAME2_COL] / samplerow[SAM_NAME2_COL])
+						latest_abs_match = float(row[RES_ABS_COL])
+						latest_conc_match = float(samplerow[SAM_CONC_COL])
+						# use 1 if the NAME2 column is empty
+						if row[RES_NAME2_COL].strip()=='':
+							latest_name2_match = 1
+						else:
+							latest_name2_match = float(row[RES_NAME2_COL])
+				
+				a = ( latest_conc_match * float(row[RES_ABS_COL]) ) / latest_abs_match
+				try:
+					b = float(row[RES_NAME2_COL]) / latest_name2_match
+				except:
+					b = 0	# handles the case were input result file has rows with empty NAME2
+				print("computing ("+str(latest_conc_match) +" * "+row[RES_ABS_COL]+") / "+str(latest_abs_match)+" * ("+ row[RES_NAME2_COL]+" / "+str(latest_name2_match)+")")
+				self.output_data[-1][3]= a * b
 				#print self.output_data[-1][0]
-		except Error as e:
-			print("Error, wrong input file format!")
+		except:
+			print("Parsing error. Wrong input file format?")
 			self.exiting=True
+			print("result row: "+str(row))
+			print("sample row: "+str(samplerow))
+			print("attempting: ("+str(latest_conc_match) +" * "+row[RES_ABS_COL]+") / "+str(latest_abs_match)+" * ("+ row[RES_NAME2_COL]+" / "+str(latest_name2_match)+")")
+			raise
 					
 		print("records in/out: "+str(len(self.data))+"/"+str(len(self.output_data)))
 		self.sig_data.sigdata.emit(self.output_data)
