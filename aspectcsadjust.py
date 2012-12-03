@@ -31,6 +31,8 @@ SAM_CONC_COL=2
 SAM_ABS_COL=3
 SAM_NAME2_COL=4
 
+REP_ABS_COL=7
+
 class MyTableModel(QAbstractTableModel): 
 	def __init__(self, data, header, parent=None, *args):
 		QAbstractTableModel.__init__(self, parent, *args)
@@ -54,10 +56,11 @@ class MyTableModel(QAbstractTableModel):
 	def data(self, index, role):
 		if not index.isValid():
 			return None
-		elif role != Qt.DisplayRole:
-			return None
-		return self.full_data[index.row()][index.column()]
-
+		if role == Qt.DisplayRole:
+			return self.full_data[index.row()][index.column()]
+		if role == Qt.BackgroundColorRole and index.column()==REP_ABS_COL:
+			return QBrush(Qt.green)
+		return None
 	def headerData(self, col, orientation, role):
 		if orientation == Qt.Horizontal and role == Qt.DisplayRole:
 			return self.headerdata[col]
