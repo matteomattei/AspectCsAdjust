@@ -161,7 +161,7 @@ class WorkingThread(QThread):
 					b = float(row[RES_NAME2_COL]) / latest_name2_match
 				except:
 					b = 0	# handles the case were input result file has rows with empty NAME2
-				print("computing ("+str(latest_conc_match) +" * "+row[RES_ABS_COL]+") / "+str(latest_abs_match)+" * ("+ row[RES_NAME2_COL]+" / "+str(latest_name2_match)+")")
+				#print("computing ("+str(latest_conc_match) +" * "+row[RES_ABS_COL]+") / "+str(latest_abs_match)+" * ("+ row[RES_NAME2_COL]+" / "+str(latest_name2_match)+")")
 				self.output_data[-1][3]= a * b
 				#print self.output_data[-1][0]
 		except:
@@ -174,7 +174,8 @@ class WorkingThread(QThread):
 					
 		print("records in/out: "+str(len(self.data))+"/"+str(len(self.output_data)))
 		self.sig_data.sigdata.emit(self.output_data)
-	
+		self.generatereport(self.output_data)
+
 	def parsesample(self):
 		"""Parse sample csv file"""
 		self.sampledata = []
@@ -182,6 +183,16 @@ class WorkingThread(QThread):
 			reader = csv.reader(samples)
 			for row in reader:
 				self.sampledata.append(row)
+	
+	def generatereport(self, data):
+		with open(self.reportfile,'w') as report:
+			writer = csv.writer(report, delimiter=',')
+			try:
+				for row in data:
+					writer.writerow(row)
+			except csv.Error as e:
+				sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
+		print("generated report!")
 
 class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self, parent=None):
@@ -319,12 +330,12 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 	
 	def filltable(self, data):
 		header = ['No.', 'Nome', 'Elemento', 'Concentrazione', 'KAL', 'Diluizione', 'Posizione', 'Assorbanza', 'Data', 'Ora']
-		#data = [('uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove'),('uno', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove')]
 		nrows = len(data)
 		tm = MyTableModel(data, header, self)
-		#self.tableView.setItemDelegate( MyCellDelegate() )
 		self.tableView.setModel(tm)
 		self.tableView.resizeColumnsToContents()
+		self.tableView.resizeRowsToContents()
+		#self.tableView.horizontalHeader().setStretchLastSection(True)
 		#print(data)
 
 if __name__ == "__main__":
