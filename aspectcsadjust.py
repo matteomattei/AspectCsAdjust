@@ -202,6 +202,7 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		self.centerwindow()
 		self.filebrowser = QFileDialog(self)
 		self.setWindowTitle('AspectCSAdjust v.'+VERSION)
+		self.setWindowIcon(QtGui.QIcon('resources/icon128x128.png'))
 		self.thread = WorkingThread()
 		self.thread.started.connect(self.thread_started)
 		self.thread.finished.connect(self.thread_finished)

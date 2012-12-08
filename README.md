@@ -6,4 +6,9 @@ Tool to adjust values for Aspect CS
 
 *   Python 2.7 or Python 2.8 or Python 3.x
 *   PySide 1.1.2
-*   PyInstaller (or Py2exe)
+*   Py2exe
+*   InnoSetup
+
+## Installation ##
+
+On windows double click on make.bat
