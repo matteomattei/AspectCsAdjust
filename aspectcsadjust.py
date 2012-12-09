@@ -10,7 +10,6 @@ import sys, os, time, csv
 VERSION='0.3'
 UPDATE_DELAY=5
 
-PERSIST_FILE=".persist"
 DEFAULT_RESULT='C:\Result.csv'
 DEFAULT_SAMPLE='C:\Defstd.alv'
 DEFAULT_REPORT='C:\Report.csv'
@@ -32,6 +31,21 @@ SAM_ABS_COL=3
 SAM_NAME2_COL=4
 
 REP_ABS_COL=7
+
+""" User defined configuration folder """
+LOCAL_DIRECTORY='AspectCSAdjust'
+if sys.platform=='linux':
+	dir = os.path.join(os.environ['HOME'],LOCAL_DIRECTORY)
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+	PERSIST_FILE=os.path.join(dir,'.persist')
+elif sys.platform=='win32':
+	dir = os.path.join(os.environ['APPDATA'],LOCAL_DIRECTORY)
+	if not os.path.exists(dir):
+		os.makedirs(dir)
+	PERSIST_FILE=os.path.join(dir,'.persist')
+else:
+	PERSIST_FILE='.persist'
 
 class MyTableModel(QAbstractTableModel): 
 	def __init__(self, data, header, parent=None, *args):
