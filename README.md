@@ -11,7 +11,7 @@ Tool to adjust values for Aspect CS
 
 ## Installation ##
 
-On windows double click on make.bat
+For windows copy MSVCP90.DLL in the root directory and then double click on make.bat
 
 ## Development note ##
 
