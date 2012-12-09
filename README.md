@@ -12,3 +12,7 @@ Tool to adjust values for Aspect CS
 ## Installation ##
 
 On windows double click on make.bat
+
+## Development note ##
+
+Everytime a new version is released, remember to update the version number both in aspectcsadjust.py and stup.iss.
