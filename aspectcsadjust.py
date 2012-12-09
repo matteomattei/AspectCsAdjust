@@ -116,7 +116,10 @@ class WorkingThread(QThread):
 				persist.write(self.resultfile+'\n')
 		except:
 			self.exiting=True
-		f.close()
+		try:
+			f.close()
+		except:
+			pass
 		print("Checking files: OK")
 
 	def parseresult(self):
