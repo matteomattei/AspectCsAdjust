@@ -7,7 +7,7 @@ from PySide.QtCore import *
 from aspectcsadjust_ui import *
 import sys, os, time, csv
 
-VERSION='0.2'
+VERSION='0.3'
 UPDATE_DELAY=5
 
 PERSIST_FILE=".persist"
@@ -82,6 +82,8 @@ class WorkingThread(QThread):
 		self.samplefile = ''
 		self.reportfile = ''
 		self.sampledata = []
+		self.output_data = []
+		self.old_output_data = []
 
 	def run(self):
 		"""Thread callback"""
@@ -115,6 +117,7 @@ class WorkingThread(QThread):
 		except:
 			self.exiting=True
 		f.close()
+		print("Checking files: OK")
 
 	def parseresult(self):
 		"""Parse result csv file"""
@@ -130,7 +133,8 @@ class WorkingThread(QThread):
  				sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
 	
 	def processresult(self):
-		"""Generate output reports based on latest result data"""
+		"""Generate output reports in RAM based on latest result data"""
+		self.old_output_data = self.output_data;
 		self.output_data = []
 		try:
 			# output_data format: ("Numero,Nome,Elemento,Concentrazione,KAL,Diluizione,Posizione,Assorbanza,Data,Ora")
@@ -174,7 +178,10 @@ class WorkingThread(QThread):
 					
 		print("records in/out: "+str(len(self.data))+"/"+str(len(self.output_data)))
 		self.sig_data.sigdata.emit(self.output_data)
-		self.generatereport(self.output_data)
+		if self.output_data != self.old_output_data:
+			self.generatereport(self.output_data)
+		else:
+			print("Same data, not regenerating csv report file")
 
 	def parsesample(self):
 		"""Parse sample csv file"""
@@ -185,6 +192,7 @@ class WorkingThread(QThread):
 				self.sampledata.append(row)
 	
 	def generatereport(self, data):
+		"""Dump report to disk in csv format"""
 		with open(self.reportfile,'w') as report:
 			writer = csv.writer(report, delimiter=',')
 			try:
@@ -275,7 +283,9 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		print('started')
 	def thread_finished(self):
 		print('finished')
+		self.setuistate(True)
 	def thread_terminated(self):
+		self.setuistate(True)
 		print('terminated')
 
 	def checkfiles(self):
@@ -284,6 +294,26 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		if self.editSample.text() == '': return False
 		if self.editResult.text() == '': return False
 		return True
+	
+	def setuistate(self, Enable):
+		"""Enables or disables the UI"""
+		if(Enable==True):
+			self.buttonStart.setText('Start')
+			self.buttonReport.setEnabled(True)
+			self.buttonSample.setEnabled(True)
+			self.buttonResult.setEnabled(True)
+			self.editReport.setEnabled(True)
+			self.editSample.setEnabled(True)
+			self.editResult.setEnabled(True)
+			self.lcdNumber.display(0)
+		else:
+			self.buttonStart.setText('Stop')
+			self.buttonReport.setEnabled(False)
+			self.buttonSample.setEnabled(False)
+			self.buttonResult.setEnabled(False)
+			self.editReport.setEnabled(False)
+			self.editSample.setEnabled(False)
+			self.editResult.setEnabled(False)
 	
 	def start(self):
 		"""Callback for start application.
@@ -294,27 +324,14 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		self.thread.exiting=False
 		self.thread.start()
 		self.waitstatus('running')
-		self.buttonStart.setText('Stop')
-		self.buttonReport.setEnabled(False)
-		self.buttonSample.setEnabled(False)
-		self.buttonResult.setEnabled(False)
-		self.editReport.setEnabled(False)
-		self.editSample.setEnabled(False)
-		self.editResult.setEnabled(False)
+		self.setuistate(False)
 		
 	def stop(self):
 		"""Callback for stop application.
 		Stop thread and re-enable all fields."""
 		self.thread.exiting=True
 		self.waitstatus('finished')
-		self.buttonStart.setText('Start')
-		self.buttonReport.setEnabled(True)
-		self.buttonSample.setEnabled(True)
-		self.buttonResult.setEnabled(True)
-		self.editReport.setEnabled(True)
-		self.editSample.setEnabled(True)
-		self.editResult.setEnabled(True)
-		self.lcdNumber.display(0)
+		self.setuistate(True)
 
 	def waitstatus(self, status):
 		"""Blocking wait until the thread is started/finished."""
