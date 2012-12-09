@@ -235,6 +235,9 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		self.thread.terminated.connect(self.thread_terminated)
 		self.thread.sig_timer.sigtimer.connect(self.updatetimer)
 		self.thread.sig_data.sigdata.connect(self.filltable)
+		self.editResult.setReadOnly(True)
+		self.editSample.setReadOnly(True)
+		self.editReport.setReadOnly(True)
 	
 		try:
 			with open(PERSIST_FILE,'r') as persist:
