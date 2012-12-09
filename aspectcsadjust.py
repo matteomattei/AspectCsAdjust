@@ -134,7 +134,8 @@ class WorkingThread(QThread):
 			f.close()
 		except:
 			pass
-		print("Checking files: OK")
+		if self.exiting!=True:
+			print("Checking files: OK")
 
 	def parseresult(self):
 		"""Parse result csv file"""
