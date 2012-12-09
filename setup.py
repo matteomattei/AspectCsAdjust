@@ -24,5 +24,5 @@ setup(
 			"optimize": 2,
         }
     },
-	data_files = Mydata_files
+    data_files = Mydata_files
 )
