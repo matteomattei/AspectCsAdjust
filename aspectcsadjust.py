@@ -255,7 +255,7 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 
 	def selectSample(self):
 		"""Slot for select sample file."""
-		archive = self.filebrowser.getOpenFileName(self,'Select Sample CSV file','.','CSV file (*.csv)')
+		archive = self.filebrowser.getOpenFileName(self,'Select Sample CSV file','.','CSV file (*.csv *.alv)')
 		if archive[0] != '' and os.path.isfile(archive[0]):
 			self.thread.samplefile = archive[0]
 			self.editSample.setText(archive[0]) 
