@@ -10,10 +10,6 @@ import sys, os, time, csv
 VERSION='0.3'
 UPDATE_DELAY=5
 
-DEFAULT_RESULT='C:\Result.csv'
-DEFAULT_SAMPLE='C:\Defstd.alv'
-DEFAULT_REPORT='C:\Report.csv'
-
 RES_ROWLEN=43
 RES_NUM_COL=0
 RES_NAME_COL=1
@@ -30,6 +26,7 @@ SAM_CONC_COL=2
 SAM_ABS_COL=3
 SAM_NAME2_COL=4
 
+REP_CONC_COL=3
 REP_ABS_COL=7
 
 """ User defined configuration folder """
@@ -39,13 +36,22 @@ if sys.platform=='linux':
 	if not os.path.exists(dir):
 		os.makedirs(dir)
 	PERSIST_FILE=os.path.join(dir,'.persist')
+	DEFAULT_RESULT='./Result.csv'
+	DEFAULT_SAMPLE='./Defstd.alv'
+	DEFAULT_REPORT='./Report.csv'
 elif sys.platform=='win32':
 	dir = os.path.join(os.environ['APPDATA'],LOCAL_DIRECTORY)
 	if not os.path.exists(dir):
 		os.makedirs(dir)
 	PERSIST_FILE=os.path.join(dir,'.persist')
+	DEFAULT_RESULT='C:\Result.csv'
+	DEFAULT_SAMPLE='C:\Defstd.alv'
+	DEFAULT_REPORT='C:\Report.csv'
 else:
 	PERSIST_FILE='.persist'
+	DEFAULT_RESULT='./Result.csv'
+	DEFAULT_SAMPLE='./Defstd.alv'
+	DEFAULT_REPORT='./Report.csv'
 
 class MyTableModel(QAbstractTableModel): 
 	def __init__(self, data, header, parent=None, *args):
@@ -72,7 +78,7 @@ class MyTableModel(QAbstractTableModel):
 			return None
 		if role == Qt.DisplayRole:
 			return self.full_data[index.row()][index.column()]
-		if role == Qt.BackgroundColorRole and index.column()==REP_ABS_COL:
+		if role == Qt.BackgroundColorRole and index.column()==REP_CONC_COL:
 			return QBrush(Qt.green)
 		return None
 	def headerData(self, col, orientation, role):
@@ -280,7 +286,8 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 
 	def selectReport(self):
 		"""Slot for select report file."""
-		archive = self.filebrowser.getSaveFileName(self,'Select Report CSV file','aaa.csv','CSV file (*.csv)')
+		deffilename = os.path.basename(self.thread.reportfile)
+		archive = self.filebrowser.getSaveFileName(self,'Select Report CSV file',deffilename,'CSV file (*.csv)')
 		if archive[0] != '':
 			self.thread.reportfile = archive[0]
 			self.editReport.setText(archive[0])
