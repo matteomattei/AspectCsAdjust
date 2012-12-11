@@ -390,6 +390,7 @@ class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 		nrows = len(data)
 		tm = MyTableModel(data, header, self)
 		self.tableView.setModel(tm)
+		self.tableView.horizontalHeader().setMinimumSectionSize(60)
 		self.tableView.resizeColumnsToContents()
 		self.tableView.resizeRowsToContents()
 		#self.tableView.horizontalHeader().setStretchLastSection(True)
