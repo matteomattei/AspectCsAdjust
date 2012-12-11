@@ -158,46 +158,57 @@ class WorkingThread(QThread):
 	
 	def processresult(self):
 		"""Generate output reports in RAM based on latest result data"""
-		self.old_output_data = self.output_data;
+		self.old_output_data = self.output_data
 		self.output_data = []
 		try:
 			# output_data format: ("Numero,Nome,Elemento,Concentrazione,KAL,Diluizione,Posizione,Assorbanza,Data,Ora")
-			# Init the reference sample to be used. It is done outside the loop because it is global to the "parser pass", i.e. it is entirely possible
-			# that, when we parse the nth result row, we have to use the sample row from one of the previous result rows. This is due to the fact that
-			# the sample to be used in the formula is defined as "the latest sample row whose NAME and LINE matched the NAME and LINE in a result row"
-			latest_conc_match = 0
-			# ABS value from the latest result row that matched with a sample
-			latest_abs_match = 1 
-			latest_name2_match = 1
 			for row in self.data:
 				self.output_data.append([row[RES_NUM_COL],row[RES_NAME_COL],row[RES_LINE_COL].strip("1234567890 "),0,' ',row[RES_NAME2_COL],row[RES_POS_COL],row[RES_ABS_COL],row[RES_DATE_COL],row[RES_TIME_COL]])
-				for samplerow in self.sampledata:
-					#print row
-					#print samplerow
-					# Check whether we have to update the latest matching sample
-					if row[RES_NAME_COL].strip()==samplerow[SAM_NAME_COL].strip() and row[RES_LINE_COL].strip("1234567890 ")==samplerow[SAM_LINE_COL].strip():
-						latest_abs_match = float(row[RES_ABS_COL])
-						latest_conc_match = float(samplerow[SAM_CONC_COL])
-						# use 1 if the NAME2 column is empty
-						if row[RES_NAME2_COL].strip()=='':
-							latest_name2_match = 1
-						else:
-							latest_name2_match = float(row[RES_NAME2_COL])
+				data_upto_here = list(self.data[0:len(self.output_data)])
 				
-				a = ( latest_conc_match * float(row[RES_ABS_COL]) ) / latest_abs_match
-				try:
-					b = float(row[RES_NAME2_COL]) / latest_name2_match
-				except:
-					b = 0	# handles the case were input result file has rows with empty NAME2
-				#print("computing ("+str(latest_conc_match) +" * "+row[RES_ABS_COL]+") / "+str(latest_abs_match)+" * ("+ row[RES_NAME2_COL]+" / "+str(latest_name2_match)+")")
-				self.output_data[-1][3]= a * b
-				#print self.output_data[-1][0]
+				# parse back the results to look for the latest (first when going back) standard (i.e. line whose name is in the standards list) whose LINE matches this result's LINE (except for numbers)
+				rrow_is_also_current_row=True
+				current_row_is_standard=False
+				standard_found=False
+				standard_conc=0
+				standard_abs=1
+				standard_dilut=1
+				row_stripped_line=row[RES_LINE_COL].strip("1234567890 ")
+				for rrow in reversed(data_upto_here):
+					for standardrow in self.sampledata:
+						if rrow[RES_NAME_COL].strip()==standardrow[SAM_NAME_COL].strip():
+							if rrow_is_also_current_row==True:	# the current row is a standard, we can skip the rest of the outer loop, too.
+								current_row_is_standard=True
+								#print ("STANDARD: no."+rrow[RES_NUM_COL])
+								break
+							if row_stripped_line==rrow[RES_LINE_COL].strip("123456789 "): # we found the standard to use!
+								for nest_stdrow in self.sampledata:
+									if row_stripped_line==nest_stdrow[SAM_LINE_COL].strip():
+										standard_conc=float(nest_stdrow[SAM_CONC_COL])
+										break
+								standard_abs=float(rrow[RES_ABS_COL])
+								if(rrow[RES_NAME2_COL].strip()!=''):
+									standard_dilut=float(rrow[RES_NAME2_COL])
+								standard_found=True
+								#print("MATCH: no."+rrow[RES_NUM_COL]+" CONC="+str(standard_conc)+" ABS="+str(standard_abs)+" DIL="+str(standard_dilut))
+								break
+					rrow_is_also_current_row=False  #ok, the current row is not a standard.
+					if current_row_is_standard or standard_found==True:
+						break
+				# the current row is a regular sample and we found the latest matching standard, compute the new concentration!
+				if standard_found==True:
+					a = ( standard_conc * float(row[RES_ABS_COL]) ) / standard_abs
+					try:
+						b = float(row[RES_NAME2_COL]) / standard_dilut
+					except:
+						b = 0   # handles the case were input result file has rows with empty NAME2
+					#print("computing ("+str(standard_conc) +" * "+row[RES_ABS_COL]+") / "+str(standard_abs)+" * ("+ row[RES_NAME2_COL]+" / "+str(standard_dilut)+")")
+					self.output_data[-1][REP_CONC_COL]= a * b
+					#print self.output_data[-1][0]
 		except:
 			print("Parsing error. Wrong input file format?")
 			self.exiting=True
-			print("result row: "+str(row))
-			print("sample row: "+str(samplerow))
-			print("attempting: ("+str(latest_conc_match) +" * "+row[RES_ABS_COL]+") / "+str(latest_abs_match)+" * ("+ row[RES_NAME2_COL]+" / "+str(latest_name2_match)+")")
+			print("attempting: ("+str(standard_conc) +" * "+row[RES_ABS_COL]+") / "+str(standard_abs)+" * ("+ row[RES_NAME2_COL]+" / "+str(standard_dilut)+")")
 			raise
 					
 		print("records in/out: "+str(len(self.data))+"/"+str(len(self.output_data)))
