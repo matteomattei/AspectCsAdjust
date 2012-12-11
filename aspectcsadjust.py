@@ -104,7 +104,8 @@ class WorkingThread(QThread):
 		self.sampledata = []
 		self.output_data = []
 		self.old_output_data = []
-
+		self.data = []
+		self.old_data =[]
 	def run(self):
 		"""Thread callback"""
 		self.checkfiles()
@@ -117,8 +118,12 @@ class WorkingThread(QThread):
 		while self.exiting==False:
 			if counter>=UPDATE_DELAY:
 				counter=0
+				self.old_data = self.data
 				self.parseresult()
-				self.processresult()
+				if self.old_data != self.data:
+					self.processresult()
+				else:
+					print("Results on disk did not change, skipping data processing!")
 			else:
 				counter=counter+1
 			self.sig_timer.sigtimer.emit(counter)
