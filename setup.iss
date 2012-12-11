@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AspectCSAdjust"
-#define MyAppVersion "0.3"
+#define MyAppVersion "0.4"
 #define MyAppPublisher "Matteo Mattei"
 #define MyAppURL "https://github.com/matteomattei/AspectCsAdjust"
 #define MyAppExeName "aspectcsadjust.exe"
