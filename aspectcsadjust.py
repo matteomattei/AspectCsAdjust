@@ -233,14 +233,19 @@ class WorkingThread(QThread):
 	
 	def generatereport(self, data):
 		"""Dump report to disk in csv format"""
-		with open(self.reportfile,'w') as report:
+		try:
+			if sys.version_info >= (3,0,0):
+				report = open(self.reportfile, 'w', newline='')
+			else:
+				report = open(self.reportfile, 'wb')
 			writer = csv.writer(report, delimiter=',')
-			try:
-				for row in data:
-					writer.writerow(row)
-			except csv.Error as e:
-				sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
-		print("generated report!")
+			for row in data:
+				writer.writerow(row)
+			print("generated report!")
+		except csv.Error as e:
+			sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
+		finally:
+			report.close()
 
 class AspectCSAdjust(QtGui.QMainWindow, Ui_MainWindow):
 	def __init__(self, parent=None):
