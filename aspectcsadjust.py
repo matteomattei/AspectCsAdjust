@@ -243,7 +243,7 @@ class WorkingThread(QThread):
 				writer.writerow(row)
 			print("generated report!")
 		except csv.Error as e:
-			sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
+			sys.exit('file %s, line %d: %s' % (self.resultfile, writer.line_num, e))
 		finally:
 			report.close()
 
