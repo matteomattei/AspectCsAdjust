@@ -238,7 +238,7 @@ class WorkingThread(QThread):
 				report = open(self.reportfile, 'w', newline='')
 			else:
 				report = open(self.reportfile, 'wb')
-			writer = csv.writer(report, delimiter=';', quotechar='"')
+			writer = csv.writer(report, delimiter=';', quotechar='"', quoting=csv.QUOTE_ALL)
 			for row in data:
 				writer.writerow(row)
 			print("generated report!")
