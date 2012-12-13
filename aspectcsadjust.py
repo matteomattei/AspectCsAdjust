@@ -152,7 +152,7 @@ class WorkingThread(QThread):
 		"""Parse result csv file"""
 		self.data = []
 		with open(self.resultfile,'r') as result:
-			reader = csv.reader(result, delimiter=';', quotechar='"')
+			reader = csv.reader(result, delimiter=';')
 			try:
 				for row in reader:
 					# only bring in a row if it's the expected length. This will cut out freetext file headers.
@@ -238,7 +238,7 @@ class WorkingThread(QThread):
 				report = open(self.reportfile, 'w', newline='')
 			else:
 				report = open(self.reportfile, 'wb')
-			writer = csv.writer(report, delimiter=';')
+			writer = csv.writer(report, delimiter=';', quotechar='"')
 			for row in data:
 				writer.writerow(row)
 			print("generated report!")
