@@ -202,7 +202,10 @@ class WorkingThread(QThread):
 						break
 				# the current row is a regular sample and we found the latest matching standard, compute the new concentration!
 				if standard_found==True:
-					a = ( standard_conc * float(row[RES_ABS_COL]) ) / standard_abs
+					if standard_abs == 0:
+						a = 0
+					else:
+						a = ( standard_conc * float(row[RES_ABS_COL]) ) / standard_abs
 					try:
 						b = float(row[RES_NAME2_COL]) / standard_dilut
 					except:
