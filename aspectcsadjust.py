@@ -188,7 +188,7 @@ class WorkingThread(QThread):
 								break
 							if row_stripped_line==rrow[RES_LINE_COL].strip("1234567890 "): # we found the standard to use!
 								for nest_stdrow in self.sampledata:
-									if row_stripped_line==nest_stdrow[SAM_LINE_COL].strip():
+									if row_stripped_line==nest_stdrow[SAM_LINE_COL].strip() and standardrow[SAM_NAME_COL].strip()==nest_stdrow[SAM_NAME_COL].strip():
 										standard_conc=float(nest_stdrow[SAM_CONC_COL])
 										break
 								standard_abs=float(rrow[RES_ABS_COL])
