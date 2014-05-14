@@ -7,14 +7,14 @@ from PySide.QtCore import *
 from aspectcsadjust_ui import *
 import sys, os, time, csv
 
-VERSION='0.6'
+VERSION='0.7'
 UPDATE_DELAY=5
 
-RES_ROWLEN=43
+RES_ROWLEN=46
 RES_NUM_COL=0
 RES_NAME_COL=1
 RES_LINE_COL=2
-RES_NAME2_COL=36
+RES_NAME2_COL=39
 RES_POS_COL=32
 RES_ABS_COL=18
 RES_DATE_COL=21
