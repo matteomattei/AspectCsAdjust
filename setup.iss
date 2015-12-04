@@ -21,7 +21,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
-OutputBaseFilename=AspectCSAdjust_setup
+OutputBaseFilename=AspectCSAdjust_v{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 
