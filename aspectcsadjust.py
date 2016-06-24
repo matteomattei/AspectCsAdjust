@@ -5,9 +5,13 @@
 from PySide.QtGui import *
 from PySide.QtCore import *
 from aspectcsadjust_ui import *
-import sys, os, time, csv
+import sys, os, time, csv, re
+if sys.version_info[0] >= 3:
+	from io import StringIO as sio
+else:
+	from StringIO import StringIO as sio
 
-VERSION='0.8'
+VERSION='0.9'
 UPDATE_DELAY=5
 
 RES_ROWLEN=46
@@ -152,7 +156,14 @@ class WorkingThread(QThread):
 		"""Parse result csv file"""
 		self.data = []
 		with open(self.resultfile,'r') as result:
-			reader = csv.reader(result, delimiter=';')
+			tmpf = sio()
+			while True:
+				line = result.readline()
+				if line == '': break
+				line = re.sub('[\0\200-\377]', '', line)
+				tmpf.write(line)
+			tmpf.seek(0)
+			reader = csv.reader(tmpf, delimiter=';')
 			try:
 				for row in reader:
 					# only bring in a row if it's the expected length. This will cut out freetext file headers.
@@ -168,6 +179,7 @@ class WorkingThread(QThread):
 						self.data.append(row)
 			except csv.Error as e:
  				sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
+			tmpf.close()
 	
 	def processresult(self):
 		"""Generate output reports in RAM based on latest result data"""

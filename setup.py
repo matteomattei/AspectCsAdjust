@@ -20,7 +20,7 @@ setup(
 	],
     options = {
         "py2exe" : {
-            "includes" : ['sys', 'os', 'time', 'csv'],
+            "includes" : ['sys', 'os', 'time', 'csv', 're', 'io'],
 			"optimize": 2,
         }
     },
