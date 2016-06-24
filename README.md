@@ -4,14 +4,14 @@ Tool to adjust values for Aspect CS
 
 ## Requirements ##
 
-*   Python 2.7 or Python 2.8 or Python 3.x
-*   PySide 1.1.2
+*   Python 2.7 or Python 3.x
+*   PySide
 *   Py2exe
 *   InnoSetup
 
 ## Installation ##
 
-For windows copy MSVCP90.DLL in the root directory and then double click on make.bat
+Copy MSVCP90.DLL from your windows installation (C:\windows\system32) into the Dll folder of your Python installation (C:\Python27\DLLs) and then double click on make.bat
 
 ## Development note ##
 
