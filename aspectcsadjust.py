@@ -11,10 +11,10 @@ if sys.version_info[0] >= 3:
 else:
 	from StringIO import StringIO as sio
 
-VERSION='0.9'
+VERSION='1.0'
 UPDATE_DELAY=5
 
-RES_ROWLEN=46
+RES_ROWLEN=45
 RES_NUM_COL=0
 RES_NAME_COL=1
 RES_LINE_COL=2
@@ -177,6 +177,9 @@ class WorkingThread(QThread):
 						self.data.append(r)
 					elif(len(row)==RES_ROWLEN) and row[RES_NUM_COL].strip().isdigit():
 						self.data.append(row)
+					else:
+						print('UNKNOWN ROW LENGTH:')
+						print(row)
 			except csv.Error as e:
  				sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
 			tmpf.close()
