@@ -11,7 +11,7 @@ if sys.version_info[0] >= 3:
 else:
 	from StringIO import StringIO as sio
 
-VERSION='1.1'
+VERSION='1.2'
 UPDATE_DELAY=5
 
 RES_ROWLEN=45
@@ -168,7 +168,7 @@ class WorkingThread(QThread):
 				for row in reader:
 					# only bring in a row if it's the expected length. This will cut out freetext file headers.
 					# WORKAROUND to support the abnormal situation of 43 columns instead of 46!!!
-					if len(row)==43 and row[RES_NUM_COL].strip().isdigit():
+					if len(row)>0 and len(row)<46 and row[RES_NUM_COL].strip().isdigit():
 						r = row[0:32]
 						r.append('')
 						r.append('')
@@ -178,12 +178,11 @@ class WorkingThread(QThread):
 					elif len(row)>=46 and row[RES_NUM_COL].strip().isdigit():
 						row = row[0:45]
 						self.data.append(row)
-					elif(len(row)==RES_ROWLEN) and row[RES_NUM_COL].strip().isdigit():
-						self.data.append(row)
 					else:
 						print('UNKNOWN ROW LENGTH:')
 						print(len(row))
-						print(row[RES_NUM_COL].strip().isdigit())
+                                                if len(row) > 0:
+        					    print(row[RES_NUM_COL].strip().isdigit())
 						#print(row)
 			except csv.Error as e:
  				sys.exit('file %s, line %d: %s' % (self.resultfile, reader.line_num, e))
